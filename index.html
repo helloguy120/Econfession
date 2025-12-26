@@ -6,12 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== GLOBAL ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
@@ -20,33 +19,26 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #e5e5e5;
+  color: #eaeaea;
 }
 
-/* ===== CARD ===== */
 .container {
   width: 92%;
   max-width: 420px;
-  background: rgba(20, 20, 20, 0.85);
+  background: rgba(15, 15, 15, 0.85);
   backdrop-filter: blur(14px);
   border-radius: 16px;
   padding: 28px;
-  box-shadow:
-    0 0 40px rgba(0,0,0,0.9),
-    inset 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow: 0 0 40px rgba(0,0,0,0.9);
 }
 
-/* ===== TITLE ===== */
 h1 {
   text-align: center;
-  font-weight: 500;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   letter-spacing: 1px;
   margin-bottom: 18px;
-  color: #ffffff;
 }
 
-/* ===== TEXTAREA ===== */
 textarea {
   width: 100%;
   min-height: 150px;
@@ -54,23 +46,16 @@ textarea {
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 12px;
   padding: 14px;
-  color: #f1f1f1;
+  color: #fff;
   font-size: 0.95rem;
   resize: none;
   outline: none;
-  transition: border 0.3s, box-shadow 0.3s;
 }
 
 textarea::placeholder {
   color: #777;
 }
 
-textarea:focus {
-  border: 1px solid rgba(0,255,200,0.4);
-  box-shadow: 0 0 12px rgba(0,255,200,0.15);
-}
-
-/* ===== BUTTON ===== */
 button {
   width: 100%;
   margin-top: 18px;
@@ -80,33 +65,19 @@ button {
   background: linear-gradient(135deg, #00ffd5, #00aaff);
   color: #000;
   font-weight: 600;
-  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0,255,200,0.35);
-}
-
-button:active {
-  transform: scale(0.98);
-  opacity: 0.85;
-}
-
-/* ===== STATUS ===== */
 #status {
   margin-top: 14px;
   text-align: center;
   font-size: 0.85rem;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
-/* ===== FOOTER ===== */
 .footer {
+  margin-top: 18px;
   text-align: center;
-  margin-top: 20px;
   font-size: 0.7rem;
   color: #666;
 }
@@ -124,7 +95,7 @@ button:active {
 
   <div id="status"></div>
 
-  <div class="footer">No login • No tracking • No identity</div>
+  <div class="footer">No login • No identity • No tracking</div>
 </div>
 
 <!-- Firebase SDKs -->
@@ -149,11 +120,18 @@ button:active {
     const status = document.getElementById("status");
 
     if (!text) {
-      status.innerText = "Write something before submitting.";
+      status.innerText = "Please write something first.";
       return;
     }
 
     status.innerText = "Encrypting & sending...";
+
+    // Timeout safety (mobile-friendly)
+    setTimeout(() => {
+      if (status.innerText.includes("Encrypting")) {
+        status.innerText = "Still connecting... please check Firebase setup.";
+      }
+    }, 8000);
 
     db.collection("confessions").add({
       text: text,
@@ -163,8 +141,9 @@ button:active {
       status.innerText = "Confession submitted anonymously.";
       document.getElementById("confessionText").value = "";
     })
-    .catch(() => {
-      status.innerText = "Submission failed. Try again later.";
+    .catch((error) => {
+      status.innerText = "Submission failed.";
+      console.error(error);
     });
   }
 </script>
