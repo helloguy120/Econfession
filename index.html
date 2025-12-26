@@ -1,43 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anonymous Confession</title>
-
-  <!-- Firebase SDK scripts -->
-  <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js"></script>
-
-  <!-- Firebase Config and Initialization -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
-      authDomain: "jntuhconfess2k25.firebaseapp.com",
-      projectId: "jntuhconfess2k25",
-      storageBucket: "jntuhconfess2k25.firebasestorage.app",
-      messagingSenderId: "1003331591998",
-      appId: "1:1003331591998:web:5c0ad9cc6983896953166f",
-      measurementId: "G-BRQ8J8MHTK"
-    };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-  </script>
-
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Submit your anonymous confession</h1>
-  <form id="confessionForm">
-    <textarea id="confessionText" placeholder="Write here..." required></textarea>
-    <button type="submit">Submit</button>
-  </form>
-  <p id="message"></p>
+<h2>Anonymous Confession</h2>
 
-  <script src="submit.js"></script>
+<textarea id="confessionText" placeholder="Write your confession..." rows="6" cols="40"></textarea>
+<br><br>
+<button onclick="submitConfession()">Submit</button>
+
+<p id="status"></p>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js"></script>
+
+<script>
+  // Firebase config (YOUR PROJECT)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
+    authDomain: "jntuhconfess2k25.firebaseapp.com",
+    projectId: "jntuhconfess2k25",
+    storageBucket: "jntuhconfess2k25.firebasestorage.app",
+    messagingSenderId: "1003331591998",
+    appId: "1:1003331591998:web:5c0ad9cc6983896953166f"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  // 🔴 THIS WAS MISSING BEFORE
+  const db = firebase.firestore();
+
+  function submitConfession() {
+    const text = document.getElementById("confessionText").value.trim();
+    const status = document.getElementById("status");
+
+    if (!text) {
+      status.innerText = "❌ Confession cannot be empty";
+      return;
+    }
+
+    db.collection("confessions").add({
+      text: text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      status.innerText = "✅ Confession submitted successfully!";
+      document.getElementById("confessionText").value = "";
+    })
+    .catch((error) => {
+      status.innerText = "❌ Error submitting confession!";
+      console.error(error);
+    });
+  }
+</script>
+
 </body>
 </html>
