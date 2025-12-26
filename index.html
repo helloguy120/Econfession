@@ -1,25 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Anonymous Confession</title>
+<meta charset="UTF-8">
+<title>Anonymous Confession</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== GLOBAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #111 0%, #000 70%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #e5e5e5;
+}
+
+/* ===== CARD ===== */
+.container {
+  width: 92%;
+  max-width: 420px;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow:
+    0 0 40px rgba(0,0,0,0.9),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* ===== TITLE ===== */
+h1 {
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+  color: #ffffff;
+}
+
+/* ===== TEXTAREA ===== */
+textarea {
+  width: 100%;
+  min-height: 150px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 14px;
+  color: #f1f1f1;
+  font-size: 0.95rem;
+  resize: none;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+textarea::placeholder {
+  color: #777;
+}
+
+textarea:focus {
+  border: 1px solid rgba(0,255,200,0.4);
+  box-shadow: 0 0 12px rgba(0,255,200,0.15);
+}
+
+/* ===== BUTTON ===== */
+button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00ffd5, #00aaff);
+  color: #000;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,255,200,0.35);
+}
+
+button:active {
+  transform: scale(0.98);
+  opacity: 0.85;
+}
+
+/* ===== STATUS ===== */
+#status {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.7rem;
+  color: #666;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Anonymous Confession</h2>
+<div class="container">
+  <h1>ANONYMOUS CONFESSION</h1>
 
-<textarea id="confessionText" placeholder="Write your confession..." rows="6" cols="40"></textarea>
-<br><br>
-<button onclick="submitConfession()">Submit</button>
+  <textarea id="confessionText" placeholder="Type your confession here..."></textarea>
 
-<p id="status"></p>
+  <button onclick="submitConfession()">SUBMIT</button>
+
+  <div id="status"></div>
+
+  <div class="footer">No login • No tracking • No identity</div>
+</div>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js"></script>
 
 <script>
-  // Firebase config (YOUR PROJECT)
   const firebaseConfig = {
     apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
     authDomain: "jntuhconfess2k25.firebaseapp.com",
@@ -29,10 +141,7 @@
     appId: "1:1003331591998:web:5c0ad9cc6983896953166f"
   };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-
-  // 🔴 THIS WAS MISSING BEFORE
   const db = firebase.firestore();
 
   function submitConfession() {
@@ -40,21 +149,22 @@
     const status = document.getElementById("status");
 
     if (!text) {
-      status.innerText = "❌ Confession cannot be empty";
+      status.innerText = "Write something before submitting.";
       return;
     }
+
+    status.innerText = "Encrypting & sending...";
 
     db.collection("confessions").add({
       text: text,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then(() => {
-      status.innerText = "✅ Confession submitted successfully!";
+      status.innerText = "Confession submitted anonymously.";
       document.getElementById("confessionText").value = "";
     })
-    .catch((error) => {
-      status.innerText = "❌ Error submitting confession!";
-      console.error(error);
+    .catch(() => {
+      status.innerText = "Submission failed. Try again later.";
     });
   }
 </script>
