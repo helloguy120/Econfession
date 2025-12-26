@@ -11,20 +11,15 @@ form.addEventListener('submit', async (e) => {
   }
 
   try {
-    // Try to add confession
     const docRef = await db.collection('confessions').add({
       text: text,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
-    message.innerText = "Confession submitted anonymously!";
-    console.log("Document written with ID:", docRef.id);
+
+    message.innerText = "✅ Confession submitted anonymously! (ID: " + docRef.id + ")";
     form.reset();
   } catch (err) {
-    // Log full error in console
-    console.error("Error submitting confession:", err);
-    
-    // Show detailed error message on page
-    message.innerText = "Error submitting confession: " + err.code + " - " + err.message;
+    // Show full error code and message directly on page
+    message.innerText = "❌ Error submitting confession!\nCode: " + err.code + "\nMessage: " + err.message;
   }
 });
