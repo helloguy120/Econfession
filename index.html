@@ -57,8 +57,8 @@
     text-align: left;
   }
 
-  textarea:focus {
-    border-color: #555;
+  textarea:disabled {
+    opacity: 0.4;
   }
 
   button {
@@ -76,7 +76,7 @@
   }
 
   button:disabled {
-    opacity: 0.6;
+    opacity: 0.4;
     cursor: not-allowed;
   }
 
@@ -93,7 +93,10 @@
     color: #b0b6bb;
   }
 
-  /* Joy effect */
+  .closed {
+    color: #ff6b6b;
+  }
+
   .success {
     color: #7cffb2;
     animation: pop 0.6s ease;
@@ -110,7 +113,7 @@
 
 <div class="container">
   <h1>Anonymous Confession</h1>
-  <p class="note">No identity. No judgment. Just release.</p>
+  <p class="note" id="note"></p>
 
   <form id="confessionForm">
     <textarea id="confessionText" placeholder="Type what you carry inside..."></textarea>
@@ -125,6 +128,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebas
 import { getFirestore, collection, addDoc, serverTimestamp }
 from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
+/* 🔴🔴🔴 MANUAL CONTROL 🔴🔴🔴 */
+/* CHANGE ONLY THIS LINE TO OPEN OR CLOSE PAGE */
+const OPEN = false; // true = open, false = closed
+
 const firebaseConfig = {
   apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
   authDomain: "jntuhconfess2k25.firebaseapp.com",
@@ -138,9 +145,21 @@ const form = document.getElementById("confessionForm");
 const textInput = document.getElementById("confessionText");
 const status = document.getElementById("status");
 const btn = document.getElementById("submitBtn");
+const note = document.getElementById("note");
+
+if (!OPEN) {
+  textInput.disabled = true;
+  btn.disabled = true;
+  note.innerText = "Submissions are currently closed.";
+  status.innerText = "Please check back later.";
+  status.classList.add("closed");
+} else {
+  note.innerText = "Submissions are open.";
+}
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (!OPEN) return;
 
   const text = textInput.value.trim();
   if (!text) {
@@ -157,7 +176,7 @@ form.addEventListener("submit", async (e) => {
       createdAt: serverTimestamp()
     });
 
-    status.innerHTML = "✔ Confession released";
+    status.innerText = "✔ Confession submitted.";
     status.classList.add("success");
     textInput.value = "";
 
@@ -167,7 +186,6 @@ form.addEventListener("submit", async (e) => {
   }
 
   btn.disabled = false;
-  setTimeout(() => status.classList.remove("success"), 1000);
 });
 </script>
 
