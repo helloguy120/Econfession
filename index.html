@@ -10,7 +10,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: system-ui, sans-serif;
 }
 
 body {
@@ -25,7 +25,7 @@ body {
 .container {
   width: 92%;
   max-width: 420px;
-  background: rgba(15, 15, 15, 0.85);
+  background: rgba(15,15,15,0.85);
   backdrop-filter: blur(14px);
   border-radius: 16px;
   padding: 28px;
@@ -43,7 +43,7 @@ textarea {
   width: 100%;
   min-height: 150px;
   background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   padding: 14px;
   color: #fff;
@@ -72,7 +72,6 @@ button {
   margin-top: 14px;
   text-align: center;
   font-size: 0.85rem;
-  opacity: 0.9;
 }
 
 .footer {
@@ -98,9 +97,9 @@ button {
   <div class="footer">No login • No identity • No tracking</div>
 </div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js"></script>
+<!-- ✅ FIREBASE COMPAT SDKs (IMPORTANT) -->
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -125,13 +124,6 @@ button {
     }
 
     status.innerText = "Encrypting & sending...";
-
-    // Timeout safety (mobile-friendly)
-    setTimeout(() => {
-      if (status.innerText.includes("Encrypting")) {
-        status.innerText = "Still connecting... please check Firebase setup.";
-      }
-    }, 8000);
 
     db.collection("confessions").add({
       text: text,
