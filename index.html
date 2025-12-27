@@ -18,6 +18,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    overflow: hidden;
   }
 
   .container {
@@ -28,6 +29,7 @@
     padding: 26px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.8);
     text-align: center;
+    position: relative;
   }
 
   h1 {
@@ -55,6 +57,7 @@
     resize: none;
     outline: none;
     text-align: left;
+    transition: transform 0.3s ease;
   }
 
   textarea:disabled {
@@ -73,6 +76,7 @@
     background: linear-gradient(135deg, #7f5cff, #ff5ca8, #111);
     background-size: 200% 200%;
     animation: gradientMove 6s ease infinite;
+    transition: transform 0.3s ease;
   }
 
   button:disabled {
@@ -103,8 +107,28 @@
   }
 
   @keyframes pop {
-    0% { transform: scale(0.9); opacity: 0; }
+    0% { transform: scale(0.7); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Confetti styles */
+  .confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #ff5ca8;
+    top: 0;
+    left: 50%;
+    pointer-events: none;
+    opacity: 0.9;
+    border-radius: 50%;
+    animation: fall 1s linear forwards;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(150px) rotate(720deg); opacity: 0; }
   }
 </style>
 </head>
@@ -128,7 +152,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebas
 import { getFirestore, collection, doc, setDoc, serverTimestamp } 
 from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-/* MANUAL OPEN/CLOSE CONTROL */
 const OPEN = true; // true=open, false=closed
 
 const firebaseConfig = {
@@ -145,6 +168,7 @@ const textInput = document.getElementById("confessionText");
 const status = document.getElementById("status");
 const btn = document.getElementById("submitBtn");
 const note = document.getElementById("note");
+const container = document.querySelector('.container');
 
 if (!OPEN) {
   textInput.disabled = true;
@@ -154,6 +178,19 @@ if (!OPEN) {
   status.classList.add("closed");
 } else {
   note.innerText = "Submissions are open.";
+}
+
+// Function to create confetti effect
+function createConfetti() {
+  for (let i = 0; i < 20; i++) {
+    const confetti = document.createElement('div');
+    confetti.classList.add('confetti');
+    confetti.style.left = `${Math.random() * 100}%`;
+    confetti.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 60%)`;
+    confetti.style.animationDuration = `${0.8 + Math.random()*0.7}s`;
+    container.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 1500);
+  }
 }
 
 form.addEventListener("submit", async (e) => {
@@ -170,21 +207,23 @@ form.addEventListener("submit", async (e) => {
   status.innerText = "Encrypting & sending...";
 
   try {
-    // 🔹 Create ID: DDMM-HHMMSS
+    // ID: DDMM-HHMMSS
     const now = new Date();
     const docID = `${now.getDate().toString().padStart(2,'0')}${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}${now.getSeconds().toString().padStart(2,'0')}`;
 
-    const docRef = doc(db, "confessions", docID); // Correctly create doc with ID
+    const docRef = doc(db, "confessions", docID);
     await setDoc(docRef, {
       text: text,
       createdAt: serverTimestamp()
     });
 
-    status.innerText = "✔ Confession submitted.";
+    // Success effect
+    status.innerText = "✔ Confession submitted!";
     status.classList.add("success");
     textInput.value = "";
+    createConfetti(); // show confetti
 
-    setTimeout(() => location.reload(), 800); // reload page
+    setTimeout(() => location.reload(), 1000); // reload page
 
   } catch (err) {
     console.error(err);
